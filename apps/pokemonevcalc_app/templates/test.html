@@ -1,0 +1,554 @@
+<div class="input-row">
+    {% if defPokemonError %}
+        <p class="error">Please enter in a valid Pokemon</p>
+    {% endif %}
+    <label for="calcpokemon">Pokémon:</label>
+    <div class="form-input-with-autocomplete">
+        <input type="text" class="medium-text" name="calcpokemon" oninput="autoComplete(this)" {% if errors and not defPokemonError %} value="{{defPokemon.get_identifier_cleaned() }}" {% endif %}/>
+        <div class="item-autocomplete"></div>
+    </div>
+</div>
+<div class="input-row">
+    <label for="item">Item:</label>
+    <div class="form-input-with-autocomplete">
+        <input type="text" class="medium-text" name="item" oninput="autoComplete(this)" {% if errors and not defPokemonError %} value="{{defPokemon.get_item_cleaned()}}" {%endif%}/>
+        <div class="item-autocomplete"></div>
+    </div>
+</div>
+<div class="input-row">
+    <label for="ability">Ability: </label>
+    <select name="ability" class="your-ability">
+        {% if errors and not defPokemonError %}
+            {% for ability in defPokemon.abilities %}
+                <option value="{{ability.identifier}}" {% if ability.identifier == defPokemon.ability.identifier %} selected {% endif %}>{{ability.get_identifier_cleaned()}}</option>
+            {% endfor %}
+        {% endif %}
+    </select>
+</div>
+<div class="input-row">
+    <label for="level">Level:</label>
+    <input class="short-number" name="level" type="number" min="1" max="100" 
+        {% if errors and not defPokemonError %} 
+            value={{defPokemon.level}}
+        {% else %}
+            value=100
+        {% endif %}
+    />
+</div>
+<div class="input-row">
+    <label for="nature-pokemon">Nature:</label>
+    <select name="nature-pokemon">
+        <option value="undecided" {% if errors and not defPokemonError and defPokemon.nature.identifier == 'undecided' %} selected {% endif %}>Not important</option>
+        {% for nature in natures %}
+            <option value="{{nature.identifier}}" {% if errors and not defPokemonError and defPokemon.nature.identifier == nature.identifier %}selected {% endif %}>{{nature.get_identifier_cleaned()}}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="input-row">
+    <label for="status">Status:</label>
+    <select name="status">
+        {% for status in statuses %}
+        <option value="{{status}}" {% if status == statuses[0] %} selected {% endif %}>{{status}}</option>
+        {% endfor %}
+    </select>
+</div>
+</div>
+<div class="conditions">
+{% if errors %}
+    {% for cond in all_conditions %}
+    <div id="condition-{{loop.index+1}}" class="cells">
+        <div class="cell">
+            <select name="condition-{{loop.index+1}}" onChange= "changeCondition(this)">
+                {% for condition in conditions %}
+                    <option value="{{condition}}" {% if cond.get_cond() == condition %} selected {% endif %}> {{condition}}</option>
+                {% endfor %}
+            </select>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                <input type="checkbox" class="btn-check" id="dynamax-self-{{loop.index+1}}" name="dynamax-self-{{loop.index+1}}" autocomplete="off">
+                <label class="btn btn-outline-secondary" for="dynamax-self-{{loop.index+1}}">Self D-Max</label>
+            </div>
+            <div class="boost-selector">
+                <label for="boost-you-{{loop.index+1}}">Your boosts:</label>
+                <select name="boost-you-{{loop.index+1}}">
+                    {% for boost in boosts %}
+                        <option value="{{boost}}"{% if boost == cond.get_raw_boost() %} selected {% endif %}>{{boost}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="cell">
+            <div class="opp-pokemon-cell">
+                <img class="opp-pokemon" {% if not empty cond.get_pokemon() %} src="https://play.pokemonshowdown.com/sprites/xyani/{{cond.get_pokemon().get_identifier_no_space()}}.gif" {% else %}  src="#" {% endif %}  alt=""/>
+                <img class="opp-item" {% if not empty cond.get_pokemon() %} src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/{{cond.get_pokemon().get_item()}}.png" {% else %}  src="#" {% endif %}  alt=""/>
+            </div>
+            <div class="type-pokemon">
+                {% if not empty cond.get_pokemon() %}
+                    {% for type in cond.get_pokemon().types %}
+                        <img src="https://www.serebii.net/pokedex-bw/type/{{type.identifier}.gif">
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% if empty cond.get_pokemon()}">
+                <p class="error">Please enter in a valid Pokemon</p>
+            {% endif %}
+            <div class="input-row">
+                <label for="pokemon-{{loop.index+1}}">Opp. Pokémon:</label>
+                <div class="form-input-with-autocomplete">
+                    <input type="text" class="medium-text" name="pokemon-{{loop.index+1}}" 	{% if not empty cond.get_pokemon() %} value="{{cond.get_pokemon().get_identifier_cleaned()}}"{% endif %} oninput="autoComplete(this)">
+                    <div class="item-autocomplete"></div>
+                </div>
+            </div>
+        </div>
+        <div class="cell">
+            <div class="input-row">
+                <label for="ability-{{loop.index+1}}">Opp. Ability:</label>
+                <select name="ability-{{loop.index+1}}" class="opp-ability">
+                    {% if not empty cond.get_pokemon() %}
+                        {% for abilityBeforehand in cond.get_pokemon().get_abilities() %}
+                        <option value="{{abilityBeforehand.get_identifier()}}" {% if abilityBeforehand.get_identifier() eq cond.get_pokemon().identifier %}selected{% endif %}>{{abilityBeforehand.get_identifier_cleaned()}}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="input-row">
+                <label for="item-{{loop.index+1}}">Opp. Item:</label>
+                <div class="form-input-with-autocomplete">
+                    <input type="text" class="medium-text" name="item-{{loop.index+1}}" oninput="autoComplete(this)" {% if not empty cond.get_pokemon() %}value="{{cond.get_pokemon().get_item_cleaned()}}"{% endif %}>
+                    <div class="item-autocomplete"></div>
+                </div>
+            </div>
+            <div class="input-row">
+                <label for="level-{{loop.index+1}}">Opp. Level:</label>
+                <input class="short-number" type="number" name="level-{{loop.index+1}}" min="1" max="100"
+                    {% if not empty cond.get_pokemon() %}
+                        value="{{cond.get_pokemon().level}}"
+                    {% else %}
+                        value=100
+                    {% endif %}
+                />
+            </div>
+            <div class="input-row">
+                <label for="nature-{{loop.index+1}}">Nature:</label>
+                <select name="nature-{{loop.index+1}}">
+                    {% for nature in natures %}
+                    <option value="{{nature.identifier}}" {% if nature.identifier eq cond.get_pokemon().getNature().get_identifier() %}selected{% endif %}>{{nature.get_identifier_cleaned()}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-row">
+                <label for="hp-percentage-{{loop.index+1}}">HP:</label>
+                <input class="short-number" type="text" name="hp-percentage-{{loop.index+1}}"
+                    {% if not empty cond.get_pokemon() %} 
+                        value="{{cond.get_health()}}"
+                    {% else %}
+                        value=100
+                    {% endif %}
+                />
+            </div>
+        </div>
+        <div class="cell">
+            <label for="move-{{loop.index+1}}">Move:</label>
+            <div class="form-input-with-autocomplete">
+                <input type="text" class="medium-text" name="move-{{loop.index+1}}" oninput="autoComplete(this)"
+                    {% if not empty cond.get_move() %}
+                        value="{{cond.get_move().get_identifier_cleaned()}}"
+                    {% endif %}>
+                    <div class="item-autocomplete"></div>
+                </div>
+                <div class="input-row invisible">
+                    <label for="hits-{{loop.index+1}}">Hits:</label>
+                    <input type="number" class="short-number" name="hits-{{loop.index+1}}" value="1"/>
+                </div>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                    <input type="checkbox" class="btn-check" id="crit-{{loop.index+1}}" name="crit-{{loop.index+1}}" {% if cond.isCritical() %} checked{% endif %} autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="crit-{{loop.index+1}}">Crit</label>
+                    <input type="checkbox" class="btn-check" id="dynamax-opp-{{loop.index+1}}" name="dynamax-opp-{{loop.index+1}}" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="dynamax-opp-{{loop.index+1}}">Opp DMax</label>
+                    <input type="checkbox" class="btn-check" id="z-{{loop.index+1}}" name="z-{{loop.index+1}}" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="z-{{loop.index+1}}">Z</label>
+                </div>
+                <label for="status">Status:</label>
+                <select name="status-{{loop.index+1}}">
+                    {% for status in statuses %}
+                        <option value="{{status}}" {% if cond.get_pokemon().getStatus() eq stat %}selected{% endif %}>{{status}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="cell">
+                <div class="defev invisible">
+                    <div class="display-ev-iv">
+                        <h6>HP</h6>
+                        <div class="input-row">
+                            <label for="hp-{{loop.index+1}}">EV:</label>
+                            <input class="short-number" type="number" name="hp-{{loop.index+1}}" min="0" max="252"
+                                {% if not empty cond.get_pokemon() %}
+                                    value="{{cond.get_pokemon().get_stats().get(0).get_effort()}"
+                                {% else %}
+                                    value="0"
+                                {% endif %}/>
+                                <label for="hp-iv-{{loop.index+1}}">IV:</label>
+                                <input class="short-number" type="number" name="hp-iv-{{loop.index+1}}" min="0" max="31"
+                                    {% if not empty cond.get_pokemon() %} 
+                                        value="{{cond.get_pokemon().get_stats().get(0).get_iv()}}"
+                                    {% else %}
+                                        value="31"
+                                    {% endif %}
+                                />
+                            </div>
+                        </div>
+
+                        <div class="display-ev-iv">
+                            <h6>Def/Spd</h6>
+                            <div class="input-row">
+                                <label for="def-{{loop.index+1}}">EV:</label>
+                                <input class="short-number" type="number" name="def-{{loop.index+1}}" min="0" max="252"
+                                    {% if not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(2).get_effort() > 0 %} 
+                                        value="{{cond.get_pokemon().get_stats().get(2).get_effort()}}" 
+                                    {% elif not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(4).get_effort() > 0 %}
+                                        value="{{cond.get_pokemon().get_stats().get(4).get_effort()}}"
+                                    {% else %}
+                                        value="0"
+                                    {% endif %}
+                                    />
+                                <label for="def-iv-{{loop.index+1}}">IV:</label>
+                                <input class="short-number" type="number" name="def-iv-{{loop.index+1}}" min="0" max="31"
+                                    {% if not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(2).get_iv() < 31 %}
+                                        value="{{cond.get_pokemon().get_stats().get(2).get_iv()}}"
+                                    {% elif not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(4).get_iv() < 31 %}
+                                        value="{{cond.get_pokemon().get_stats().get(4).get_iv()}}"
+                                    {% else %} 
+                                        value="31"
+                                    {% endif %}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="invisible offev">
+                        <div class="display-ev-iv">
+                            <h6>Atk/SpA</h6>
+                            <div class="input-row">
+                                <label for="atk-{{loop.index+1}}">EV:</label>
+                                <input class="short-number" type="number" name="atk-{{loop.index+1}}" min="0" max="252"
+                                {% if not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(1).get_effort() > 0 %}
+                                    value="{{cond.get_pokemon().get_stats().get(1).get_effort()}}"
+                                {% elif not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(3).get_effort() > 0 %}
+                                    value="{{cond.get_pokemon().get_stats().get(3).get_effort()}}"
+                                {% else %}
+                                    value="0"
+                                {% endif %}
+                                />
+                                <label for="atk-iv-{{loop.index+1}}">IV:</label>
+                                <input class="short-number" type="number" name="atk-iv-{{loop.index+1}}" min="0" max="31"
+                                    {% if not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(1).get_iv() < 31 %}
+                                        value="{{cond.get_pokemon().get_stats().get(1).get_iv()}}"
+                                    {% elif not empty cond.get_pokemon() and cond.get_pokemon().get_stats().get(3).get_iv() < 31 %}
+                                        value="{{cond.get_pokemon().get_stats().get(3).get_iv()}}"
+                                    {% else %}
+                                        value="31"
+                                    {% endif %}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="speedev">
+                        <div class="display-ev-iv">
+                            <h6>Speed</h6>
+                            <div class="input-row">
+                                <label for="speed-{{loop.index+1}}">EV:</label>
+                                <input class="short-number" type="number" name="speed-{{loop.index+1}}" min="0" max="252"
+                                    {% if not empty cond.get_pokemon() %}
+                                        value="{{cond.get_pokemon().get_stats().get(5).get_effort()}}"
+                                    {% else %}
+                                        value="0"
+                                    {% endif %}
+                                />
+                                <label for="speed-iv-{{loop.index+1}}">IV:</label>
+                                <input class="short-number" type="number" name="speed-iv-{{loop.index+1}}" min="0" max="31"
+                                {% if not empty cond.get_pokemon() %}
+                                    value="{{cond.get_pokemon().get_stats().get(5).get_iv()}"
+                                {% else %}
+                                    value="31"
+                                { % endif %}
+                                />
+                            </div>
+                        </div>
+                    </div>	
+                    
+                    <div class="boost-selector">
+                        <label for="boost-opp-{{loop.index+1}}">Opp boosts:</label>
+                        <select name="boost-opp-{{loop.index+1}}">
+                            {% for boost in boosts %}
+                                <option value="{{boost}"{% if boost eq cond.getRawOppBoost() %} selected{% endif %}>{{boost}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="cell">
+                    <div>
+                        <h4>Field Effects</h4>
+                        <label for="terrain-{{loop.index+1}}">Terrain:</label>
+                        <select name="terrain-{{loop.index+1}}">
+                            {% for terrain in terrains %}
+                            <option value="{{terrain}" {% if terrain eq cond.getTerrain() %}selected{% endif %}>{{terrain}}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="weather-{{loop.index+1}}">Weather:</label>
+                        <select name="weather-{{loop.index+1}}">
+                            {% for weather in weathers %}
+                            <option value="{{weather}}" {% if weather eq cond.getWeather() %} selected{% endif %}>{{weather}}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                            <input type="checkbox" class="btn-check" id="screen-{{loop.index+1}}" name="screen-{{loop.index+1}}" {% if cond.is_screens() %}checked{% endif %} autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="screen-{{loop.index+1}}">Screens</label>
+                            <input type="checkbox" class="btn-check" id="your-tailwind-{{loop.index+1}}" {% if cond.is_your_tw() %}checked{% endif %} name="your-tailwind-{{loop.index+1}}" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="your-tailwind-{{loop.index+1}}">Tailwind (You)</label>
+
+
+                            <input type="checkbox" class="btn-check" id="foe-tailwind-{{loop.index+1}}" {% if cond.is_foe_tw() %}checked{% endif %} name="foe-tailwind-{{loop.index+1}}" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="foe-tailwind-{{loop.index+1}}">Tailwind (Foe)</label>
+                        </div>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                            <input type="checkbox" class="btn-check" name="hh-{{loop.index+1}}" {% if cond.is_helping_hand() %}checked{% endif %} id="hh-{{loop.index+1}}" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="hh-{{loop.index+1}}">Helping Hand</label>
+                            <input type="checkbox" class="btn-check" name="flower-gift-{{loop.index+1}}" id="flower-gift-{{loop.index+1}}" {% if cond.is_flower_gift() %}checked{% endif %} autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="flower-gift-{{loop.index+1}}">Flower Gift</label>
+                            
+                            <input type="checkbox" class="btn-check" name="power-spot-{{loop.index+1}}" id="power-spot-{{loop.index+1}}" {% if cond.is_power_spot() %}checked{% endif %} autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="power-spot-{{loop.index+1}}">Power Spot</label>
+                            
+                            <input type="checkbox" class="btn-check" name="battery-{{loop.index+1}}" id="battery-{{loop.index+1}}" {% if cond.is_battery() %}checked{% endif %} autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="battery-{{loop.index+1}}">Battery</label>
+                        </div>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                            <input type="checkbox" class="btn-check" name="stealth-rock-{{loop.index+1}}" id="stealth-rock-{{loop.index+1}}" {% if cond.is_stealth_rock() %}checked{% endif %} autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="stealth-rock-{{loop.index+1}}">Stealth Rock</label>
+                        
+                            <input type="checkbox" class="btn-check" name="gravity-{{loop.index+1}}" id="gravity-{{loop.index+1}}" {% if cond.is_gravity() %}checked{% endif %} autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="gravity-{{loop.index+1}}">Gravity</label>
+                            
+                            <input type="checkbox" class="btn-check" name="smack-down-{{loop.index+1}}" id="smack-down-{{loop.index+1}}" {% if cond.is_smack_down() %}checked{% endif %} autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="smack-down-{{loop.index+1}}">Smack Down</label>
+
+                        </div>
+
+                    </div>
+                </div>
+                <img class="delete-button" src="/assets/garbage.png" alt="delete button" onClick="deleteRow(this)"/>
+            </div>
+        {% endfor %}
+        {% else %}
+        <div id="condition-1" class="cells">
+            <div class="cell">
+                <select name="condition-1" onChange= "changeCondition(this)">
+                    {% for condition in conditions %}
+                    <option value="{{condition}}">{{condition}}</option>
+                    {% endfor %}
+                </select>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                    <input type="checkbox" class="btn-check" id="dynamax-self-1" name="dynamax-self-1" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="dynamax-self-1">Self D-Max</label>
+                </div>
+                <div class="boost-selector">
+                    <label for="boost-you-1">Your boosts:</label>
+                    <select name="boost-you-1">
+                        {% for boost in boosts %}
+                        <option value="{{boost}}" {% if boost == '0' %} selected {% endif %}>{{boost}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="opp-pokemon-cell">
+                    <img class="opp-pokemon" src="#" alt=""/>
+                    <img class="opp-item" src="#" alt=""/>
+                </div>
+                <div class="type-pokemon"></div>
+                <div class="input-row">
+                    <label for="pokemon-1">Opp. Pokémon:</label>
+                    <div class="form-input-with-autocomplete">
+                        <input type="text" class="medium-text" name="pokemon-1" oninput="autoComplete(this)">
+                        <div class="item-autocomplete"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cell">
+                <div class="input-row">
+                    <label for="ability-1">Opp. Ability:</label>
+                    <select name="ability-1" class="opp-ability">
+                    </select>
+                </div>
+                <div class="input-row">
+                    <label for="item-1">Opp. Item:</label>
+                    <div class="form-input-with-autocomplete">
+                        <input type="text" class="medium-text" name="item-1" oninput="autoComplete(this)">
+                        <div class="item-autocomplete"></div>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <label for="level-1">Opp. Level:</label>
+                    <input class="short-number" type="number" name="level-1" min="1" max="100" value="100"/>
+                </div>
+                <div class="input-row">
+                    <label for="nature-1">Nature:</label>
+                    <select name="nature-1">
+                        {% for nature in natures %}
+                        <option value="{{nature.identifier}}" {%if nature == natures[0] %} selected {% endif %}>{{nature.get_identifier_cleaned()}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-row">
+                    <label for="hp-percentage-1">HP:</label>
+                    <input class="short-number" type="text" name="hp-percentage-1" value="100"/>
+                </div>
+            </div>
+            <div class="cell">
+                <label for="move-1">Move:</label>
+                <div class="form-input-with-autocomplete">
+                    <input type="text" class="medium-text" name="move-1" oninput="autoComplete(this)">
+                    <div class="item-autocomplete"></div>
+                </div>
+                <div class="input-row invisible">
+                    <label for="hits-1">Hits:</label>
+                    <input type="number" class="short-number" name="hits-1" value="1"/>
+                </div>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                    <input type="checkbox" class="btn-check" id="crit-1" name="crit-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="crit-1">Crit</label>
+                        <input type="checkbox" class="btn-check" id="dynamax-opp-1" name="dynamax-opp-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="dynamax-opp-1">Opp DMax</label>
+                        <input type="checkbox" class="btn-check" id="z-1" name="z-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="z-1">Z</label>
+                    </div>
+                <label for="status">Status:</label>
+                <select name="status-1">
+                    {% for status in statuses %}
+                    <option value="{{status}}" {% if status == statuses[0] %} selected {% endif %}>{{status}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="cell">
+                <div class="defev invisible">
+                    <div class="display-ev-iv">
+                        <h6>HP</h6>
+                        <div class="input-row">
+                            <label for="hp-1">EV:</label>
+                            <input class="short-number" type="number" name="hp-1" min="0" max="252" value="0"/>
+                            <label for="hp-iv-1">IV:</label>
+                            <input class="short-number" type="number" name="hp-iv-1" min="0" max="31" value="31"/>
+                        </div>
+                    </div>
+                    
+                    <div class="display-ev-iv">
+                        <h6>Def/Spd</h6>
+                        <div class="input-row">
+                            <label for="def-1">EV:</label>
+                            <input class="short-number" type="number" name="def-1" min="0" max="252" value="0"/>
+                            <label for="def-iv-1">IV:</label>
+                            <input class="short-number" type="number" name="def-iv-1" min="0" max="31" value="31"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="invisible offev">
+                    <div class="display-ev-iv">
+                        <h6>Atk/SpA</h6>
+                        <div class="input-row">
+                            <label for="atk-1">EV:</label>
+                            <input class="short-number" type="number" name="atk-1" min="0" max="252" value="0"/>
+                            <label for="atk-iv-1">IV:</label>
+                            <input class="short-number" type="number" name="atk-iv-1" min="0" max="31" value="31"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="speedev">
+                    <div class="display-ev-iv">
+                        <h6>Speed</h6>
+                        <div class="input-row">
+                            <label for="speed-1">EV:</label>
+                            <input class="short-number" type="number" name="speed-1" min="0" max="252" value="0"/>
+                            <label for="speed-iv-1">IV:</label>
+                            <input class="short-number" type="number" name="speed-iv-1" min="0" max="31" value="31"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="boost-selector">
+                    <label for="boost-opp-1">Opp boosts:</label>
+                    <select name="boost-opp-1">
+                        {% for boost in boosts %}
+                        <option value="{{boost}}" {% if boost == '0' %}selected{%endif%}>{{boost}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="cell">
+                <div>
+                    <h4>Field Effects</h4>
+                    <label for="terrain-1">Terrain:</label>
+                    <select name="terrain-1">
+                        {% for terrain in terrains %}
+                        <option value="{{terrain}}">{{terrain}}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="weather-1">Weather:</label>
+                    <select name="weather-1">
+                        {% for weather in weathers %}
+                        <option value="{{weather}}">{{weather}}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                        <input type="checkbox" class="btn-check" id="screen-1" name="screen-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="screen-1">Screens</label>
+
+                        <input type="checkbox" class="btn-check" id="your-tailwind-1" name="your-tailwind-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="your-tailwind-1">Tailwind (You)</label>
+                    
+                        <input type="checkbox" class="btn-check" id="foe-tailwind-1" name="foe-tailwind-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="foe-tailwind-1">Tailwind (Foe)</label>				
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                        <input type="checkbox" class="btn-check" name="hh-1" id="hh-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="hh-1">Helping Hand</label>
+                    
+                        <input type="checkbox" class="btn-check" name="flower-gift-1" id="flower-gift-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="flower-gift-1">Flower Gift</label>
+                        
+                        <input type="checkbox" class="btn-check" name="power-spot-1" id="power-spot-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="power-spot-1">Power Spot</label>
+                        
+                        <input type="checkbox" class="btn-check" name="battery-1" id="battery-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="battery-1">Battery</label>
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic checkbox toggle button group">
+                        <input type="checkbox" class="btn-check" name="stealth-rock-1" id="stealth-rock-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="stealth-rock-1">Stealth Rock</label>
+                    
+                        <input type="checkbox" class="btn-check" name="gravity-1" id="gravity-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="gravity-1">Gravity</label>
+                        
+                        <input type="checkbox" class="btn-check" name="smack-down-1" id="smack-down-1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="smack-down-1">Smack Down</label>
+                    </div>
+                </div>
+            </div>
+            <img class="delete-button" src="/assets/garbage.png" alt="delete button" onClick="deleteRow(this)"/>
+        </div>
+    {% endif %}
+    <img id="add-button" class='add-button' src="/assets/plus.png" alt="plus button" onClick="addRow()"/>
+</div>
+</div>
+<div class="centerizer">
+<button class="btn btn-primary submit-button">Calculate</button>
+</div>
+</form>
+
+<br/>
+<br/>
+<div class="footer">
+<p class="error">This project is not complete and may have inaccuracies due to incomplete understanding of mechanics.</p>
+<p class="error">Gyro ball and Electro Ball are not implemented.</p>
+<p>2021 Sasayaki7</p>
+</div>
+<script src="js/formManage.js"></script>
+</body>
+</html>

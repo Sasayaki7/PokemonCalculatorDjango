@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <img id="pokemon-pic" {% if errors and not defPokemonError %} src="https://play.pokemonshowdown.com/sprites/xyani/{{ defPokemon.get_identifier_no_space() }}.gif" {% else %} src="#" {% endif %} alt=""/>
+</body>
+</html>

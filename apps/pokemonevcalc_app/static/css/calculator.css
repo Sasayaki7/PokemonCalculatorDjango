@@ -1,0 +1,192 @@
+@charset "ISO-8859-1";
+
+
+body{
+	background-color: black;
+	color: white;	
+}
+
+
+.invisible{
+	display: none;
+}
+
+.cond-show{
+	width: 120px;
+}
+
+h1{
+	margin: auto;
+	width: 100%;
+	text-align: center;
+}
+
+.form-div{
+	display: flex;
+	margin: 15px;
+}
+
+.left-pokemon{
+	display: flex;
+	flex-direction: column;
+	justify-content: left;
+	flex: 1;
+	gap: 5px;
+	border: solid white 1px;
+}
+
+
+.item-pokemon-display{
+	position: relative;
+	height: 150px;
+	width: 150px;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 15px;
+}
+
+#item-pic{
+	position: relative;
+	height: 60px;
+	width: 60px;
+	left: 90px;
+	top: -60px;
+}
+
+.error{
+	color: red;
+}
+
+#pokemon-pic{
+	height: 150px;
+	width: 150px;
+}
+
+.type-pokemon{
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+
+.type-pokemon img{
+	height: 20px;
+}
+
+.short-number{
+	width: 60px;
+}
+
+.medium-text{
+	width: 160px;
+}
+
+.input-row{
+	display: flex;
+	gap: 5px;
+}
+
+.input-row label{
+	width: 85px;
+	font-size: 11pt;
+	text-align: right;
+}
+
+#short label{
+	width: 30px;
+}
+
+.top-row{
+	justify-content: space-around;
+}
+
+.left-pokemon .input-row{
+	margin-left: 30px;
+}
+
+
+input{
+	background-color: #444444;
+	color: white;
+}
+
+.conditions{
+	display: flex;
+	border: groove white 2px;
+	flex-direction: column;
+	flex: 4;
+}
+
+.cells{
+	display: flex;
+	gap: 5px;
+	border: white solid 1px;
+}
+
+.add-button{
+	height: 60px;
+	width: 60px;
+}
+
+.opp-pokemon-cell{
+	height: 100px;
+	width: 100px;
+	margin: auto;
+	display: block;
+}
+
+.opp-pokemon{
+	border: 0px transparent;
+	height: 100px;
+	width: 100px;
+}
+
+.opp-item{
+	height: 40px;
+	border: 0px transparent;
+	width: 40px;
+	position: relative;
+	top: -40px;
+	left: 60px;
+}
+
+.delete-button{
+	height: 60px;
+	width: 60px;
+}
+
+
+
+
+.form-input-with-autocomplete{
+	position: relative;	
+}
+
+.item-autocomplete{
+	width: 100%;
+	position: absolute;
+	z-index: 10;
+	background-color: black;
+}
+
+.autocomplete-selector{
+	border: 1px solid white;
+}
+.autocomplete-selector:hover{
+	background: gray;
+}
+
+.centerizer{
+	display: flex;
+	justify-content: center;
+}
+
+.submit-button{
+	margin: auto;
+}
+
+.footer{
+	margin:  3px auto;
+	text-align: center;
+	font-size: 9pt;
+}

@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pokémon EV/IV calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static '/css/calculatorresult.css' %}"> <!-- change to match your file/naming structure -->
+</head>
+<body>
+	<h1>Calculation Results</h1>
+	<div class = "final-display">
+		<div class="pokemon-info">
+			<div class="left-side">
+				<div class="sprite-frame">
+					<img id="pokemon-img" src="https://play.pokemonshowdown.com/sprites/xyani/{{pokemon.get_identifier_no_space}}.gif">
+					<img id="item-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/{{pokemon.item.identifier}}.png">
+				</div>
+				<h2>{{pokemon.get_identifier_cleaned}}</h2>
+				<p>Level: {{pokemon.level}}</p>
+				<p>Ability: {{pokemon.ability.get_identifier_cleaned}}</p>
+			</div>
+			<div class="stattable">
+				<table>
+					<thead>
+						<tr>
+							<th>Stat</th>
+							<th>IVs</th>
+							<th>EVs</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for result in calcedstat %}
+							<tr>
+							{% if not forloop.last %}
+								<td>{{result.1}}</td>
+								<td>31</td>
+								<td>{{result.0}}</td>
+							{% else %}
+								<td>Remaining:</td>
+								<td>31</td>
+								<td>{{result.0}}</td>
+							{% endif %}
+							</tr>
+						{% endfor %}
+					</tbody>	
+				</table>
+				<p>Nature: {{pokemon.nature.get_identifier_cleaned}}</p>
+			</div>
+		</div>
+	
+		<div class="condition-display">
+			<div>
+				<h2>Conditions that were met:</h2>
+				{% for condition in goodCondition %}
+					<div class="condition-ok condition">
+						<img src="https://www.smogon.com/forums//media/minisprites/{{condition.pokemon.identifier}}.png">
+						<p>{{condition.summary}}</p>
+					</div>
+				{% endfor %}
+			</div>
+			<div>
+				<h2>Conditions that could not be met:</h2>
+				{% for condition in badCondition %}
+					<div class="condition-ng condition">
+						<img src="https://www.smogon.com/forums//media/minisprites/{{condition.pokemon.identifier}}.png">
+						<p>{{condition.summary}}</p>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	<div class="pokepaste">
+		<p>{{pokemon.get_identifier_cleaned}} {% if pokemon.item %}@ {{pokemon.get_item_cleaned}}{% endif %}</p>
+		<p>Ability: {{pokemon.ability.get_identifier_cleaned}}</p>
+		<p>EVs: {% for result in calcedstat %}
+			{% if result.0 > 0 and not forloop.last %}
+				/
+				{{result.0}} {{result.2}}
+			{% endif %}
+			{% endfor %}
+		</p>
+		<p>{{pokemon.nature.get_identifier_cleaned}} Nature</p>  
+		<p>- </p>
+		<p>- </p>
+		<p>- </p>
+		<p>- </p>
+	</div>
+	{% if suggestedEVarr %}
+		<div class="pokepaste">
+			<p>{{pokemon.get_identifier_cleaned}} {% if pokemon.item %}@ {{pokemon.get_item_cleaned}}{% endif %}</p>
+			<p>Ability: {{pokemon.ability.get_identifier_cleaned}}</p>
+			<p>EVs: {% for result in suggestionEV %}
+				{% if result > 0 and not forloop.last %}
+					/
+					{{result}}
+				{% endif %} 
+				{% endfor %}
+			</p>
+			<p>{{suggestedNature.get_identifier_cleaned}} Nature</p>  
+			<p>- </p>
+			<p>- </p>
+			<p>- </p>
+			<p>- </p>
+		</div>
+	{% endif %} 
+	
+	<a class="btn btn-secondary center-button" href="/">Return</a>
+</body>
+</html>
+
